@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Carros2 - CONECTADO</title>
+    <style>
+        body {
+            background: #001f3f; /* Azul oscuro metálico simulado */
+            color: white;
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; color: black; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        .header { font-size: 24px; font-weight: bold; text-shadow: 2px 2px #000; }
+    </style>
+</head>
+<body>
+    <div class="header">MENÚ</div>
+    <div class="container">
+        <label>Coche</label><br>
+        <input type="text" id="txtCoche"><br><br>
+        <label>Precio</label><br>
+        <input type="text" id="txtPrecio"><br><br>
+        <button onclick="insertarCoche()">Insertar Coche</button>
+        
+        <table id="jTable1">
+            <thead>
+                <tr>
+                    <th>IdCarro</th><th>Carro</th><th>Precio</th><th>Eq.Petas</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <script>
+        // Función para listar (Equivalente a tu void listar() de Java)
+        async function listar() {
+            const res = await fetch('/autos');
+            const autos = await res.json();
+            const tbody = document.querySelector('#jTable1 tbody');
+            tbody.innerHTML = '';
+            autos.forEach(auto => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${auto.idAutos}</td>
+                        <td>${auto.Autos}</td>
+                        <td>${auto.Precio}</td>
+                        <td>${auto.EquivalenciaPeta || ''}</td>
+                    </tr>`;
+            });
+        }
+
+        // Función para insertar (Equivalente a tu jButton2ActionPerformed)
+        async function insertarCoche() {
+            const data = {
+                coche: document.getElementById('txtCoche').value,
+                precio: document.getElementById('txtPrecio').value
+            };
+
+            const res = await fetch('/insertar', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+
+            if (res.ok) {
+                alert("¡Coche guardado con éxito!");
+                listar();
+            } else {
+                alert("Error al guardar");
+            }
+        }
+
+        window.onload = listar; // Cargar tabla al iniciar
+    </script>
+</body>
+</html>
